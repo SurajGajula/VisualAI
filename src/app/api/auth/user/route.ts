@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { verifyToken, getUserById } from '@/lib/db/models/auth';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
-    // Get the token from cookies
-    const cookieJar = cookies();
-    const token = cookieJar.get('auth_token')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
     
     if (!token) {
       return NextResponse.json(
@@ -15,10 +16,8 @@ export async function GET() {
       );
     }
     
-    // Verify the token
     const decoded = verifyToken(token) as { id: number };
     
-    // Get the user
     const user = await getUserById(decoded.id);
     
     if (!user) {
@@ -36,7 +35,6 @@ export async function GET() {
   } catch (error) {
     console.error('Auth error:', error);
     
-    // Handle token verification error
     if (error instanceof Error && error.message === 'Invalid token') {
       return NextResponse.json(
         { success: false, message: 'Invalid authentication token' },
@@ -55,19 +53,25 @@ export async function GET() {
   }
 }
 
-// Logout endpoint
 export async function POST() {
-  // Clear the authentication cookie
-  const cookieJar = cookies();
-  cookieJar.set('auth_token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 0, // Expire immediately
-    path: '/',
-  });
-  
-  return NextResponse.json({
-    success: true,
-    message: 'Logged out successfully'
-  });
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set('auth_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 0,
+      path: '/',
+    });
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to logout' },
+      { status: 500 }
+    );
+  }
 } 

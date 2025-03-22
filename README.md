@@ -1,127 +1,149 @@
-# Next.js with AWS RDS PostgreSQL
+# VisualAI - Visual Novel Creation Platform
 
-This is a Next.js application that connects to an AWS RDS PostgreSQL database.
+VisualAI is an innovative web application designed to help writers, creators, and developers transform written content into visual novel formats. By leveraging modern web technologies and AI assistance, VisualAI streamlines the process of creating interactive narratives from existing text sources.
+
+![VisualAI Logo](./public/images/logo.png)
+
+## Features
+
+VisualAI offers a comprehensive set of tools to create and manage visual novel content:
+
+### Integrated Workspace
+
+The application provides a unified interface where users can access all tools from a single dashboard. The integrated workspace includes:
+
+- **PDF Parser Tool** - Extract dialogue and text from PDF documents
+- **Scene Viewer** - Preview how your visual novel scenes will look and feel
+- **Asset Manager** - Organize audio, video, and image files for your projects
+
+### PDF Text Extraction
+
+Upload PDF documents to automatically extract and parse dialogue into structured scene formats that can be used in visual novels.
+
+### Scene Editor
+
+Create, modify, and manage visual novel scenes with an intuitive dialogue editor:
+- Add and edit character dialogue
+- Organize scenes and dialogue sequences
+- Preview scenes in real-time
+
+### Asset Management System
+
+A powerful asset management system allowing users to:
+- Upload and manage audio files
+- Organize assets by type (audio, video, images)
+- Associate assets with specific scenes or characters
+
+### User Authentication
+
+Secure user authentication system with:
+- User registration and login
+- Profile management
+- Secure session handling
+
+## Technology Stack
+
+VisualAI is built with modern web technologies:
+
+- **Next.js** - React framework for server-rendered applications
+- **React** - Frontend library for building user interfaces
+- **TypeScript** - Type-safe JavaScript
+- **Tailwind CSS** - Utility-first CSS framework
+- **PDF.js** - PDF rendering library
+- **Web Audio API** - For audio processing and playback
+- **PostgreSQL** - Relational database (hosted on AWS RDS)
 
 ## Getting Started
 
-First, set up your environment variables:
+### Prerequisites
 
-1. Copy `.env.local.example` to `.env.local`:
-   ```
-   cp .env.local.example .env.local
-   ```
+- Node.js 18.x or higher
+- npm 9.x or higher
+- PostgreSQL database (local or AWS RDS)
 
-2. Update the `DATABASE_URL` in `.env.local` with your AWS RDS PostgreSQL credentials.
-   
-   **Important Note About Special Characters in Passwords:**
-   
-   If your database password contains special characters, they need to be URL-encoded in the connection string:
-   
-   - `#` should be encoded as `%23`
-   - `!` should be encoded as `%21`
-   - `@` should be encoded as `%40`
-   - `?` should be encoded as `%3F`
-   - `:` should be encoded as `%3A`
-   - `/` should be encoded as `%2F`
-   - `%` should be encoded as `%25`
-   - ` ` (space) should be encoded as `%20`
-   
-   Example: If your password is `p@ss#word`, your connection string should be:
+### Installation
+
+1. Clone the repository:
    ```
-   DATABASE_URL=postgres://username:p%40ss%23word@hostname:5432/database_name
-   ```
-   
-   Alternatively, you can use individual environment variables:
-   ```
-   DB_USER=username
-   DB_PASSWORD=p@ss#word
-   DB_HOST=hostname
-   DB_PORT=5432
-   DB_NAME=database_name
+   git clone https://github.com/yourusername/visualai.git
+   cd visualai
    ```
 
-3. Install the dependencies:
+2. Install dependencies:
    ```
    npm install
    ```
+
+3. Set up environment variables:
+   - Copy `.env.local.example` to `.env.local`
+   - Update the database connection and other required settings
 
 4. Run the development server:
    ```
    npm run dev
    ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Setting Up AWS RDS PostgreSQL
+### Database Setup
 
-### 1. Create an AWS RDS PostgreSQL Instance
+The application requires a PostgreSQL database. You can use a local PostgreSQL instance or AWS RDS:
 
-1. Go to the [AWS RDS Console](https://console.aws.amazon.com/rds/).
-2. Click "Create database".
-3. Choose "PostgreSQL" as the engine.
-4. Select the appropriate DB instance size for your needs.
-5. Configure connectivity settings:
-   - Make sure to create in a VPC with appropriate security groups.
-   - For development, you might want to make it publicly accessible.
-6. Configure authentication and create a master username and password.
-7. Create the database.
+1. Create a database for the application
+2. Update your `.env.local` file with the connection details
+3. Run the database migrations:
+   ```
+   npx prisma migrate dev
+   ```
 
-### 2. Configure Security Group
+## Usage Guide
 
-1. Make sure your RDS instance's security group allows incoming connections on port 5432 from your application's IP address.
-2. For development, you might set the source to `0.0.0.0/0` (not recommended for production).
+### PDF Parsing
 
-### 3. Connect to Your Database
+1. Navigate to the PDF Tool in the dashboard
+2. Upload a PDF document
+3. The system will extract dialogue and text
+4. Review the extracted content in the Scene Viewer
 
-1. Use a PostgreSQL client like pgAdmin or psql to connect to your database.
-2. Run the SQL schema from `src/lib/db/schema.sql` to create the necessary tables.
+### Scene Editing
 
-### 4. Update Application Configuration
+1. Open the Scene Editor
+2. Add character dialogue with speaker names
+3. Edit or delete dialogue lines as needed
+4. Preview your scene in real-time
 
-Update your `.env.local` file with the correct connection details:
+### Asset Management
 
-```
-DATABASE_URL=postgres://username:password@your-rds-endpoint:5432/database_name
-```
+1. Access the Asset Manager
+2. Upload audio files for your visual novel
+3. Organize assets by type (audio, video, images)
+4. Future updates will support video and image assets
 
-Or use individual environment variables:
+## Project Structure
 
-```
-DB_USER=username
-DB_PASSWORD=password
-DB_HOST=your-rds-endpoint
-DB_PORT=5432
-DB_NAME=database_name
-```
+- `/src/app` - Next.js app directory with page components
+- `/src/components` - Reusable React components
+- `/src/context` - React context providers
+- `/src/lib` - Utility functions and database operations
+- `/src/types` - TypeScript type definitions
+- `/public` - Static assets
 
-## Database Operations
+## Contributing
 
-This application includes a simple model for user operations in `src/lib/db/models/user.ts`, demonstrating how to:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- Retrieve all users
-- Get a user by ID
-- Create a user
-- Update a user
-- Delete a user
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-You can use these as examples for building your own database operations.
+## License
 
-## Testing the Connection
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-The application includes a simple UI for testing the database connection. Click the "Test Database Connection" button on the homepage to verify if your application can connect to the AWS RDS PostgreSQL database.
+## Contact
 
-## Production Deployment
-
-For production deployment, make sure to:
-
-1. Set up appropriate security groups for your RDS instance.
-2. Configure environment variables in your deployment platform.
-3. Use SSL for database connections for production environments.
-
-## Learn More
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [AWS RDS Documentation](https://docs.aws.amazon.com/rds/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+For support or inquiries, please contact support@visualai.example.com
 
 
