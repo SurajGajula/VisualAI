@@ -1,9 +1,21 @@
-declare module 'pdfjs-dist/legacy/build/pdf' {
-  const content: any;
-  export = content;
+declare global {
+  interface Window {
+    pdfjsLib: {
+      getDocument: (params: { data: Uint8Array }) => {
+        promise: Promise<{
+          numPages: number;
+          getPage: (pageIndex: number) => Promise<{
+            getTextContent: () => Promise<{
+              items: Array<{ str: string }>;
+            }>;
+          }>;
+        }>;
+      };
+      GlobalWorkerOptions: {
+        workerSrc: string;
+      };
+    };
+  }
 }
 
-declare module 'pdfjs-dist/legacy/build/pdf.worker.entry' {
-  const content: any;
-  export = content;
-} 
+export {}; 

@@ -1,57 +1,51 @@
-# VisualAI - Visual Novel Creation Platform
+# VisualAI - Visual Novel Creation Tool
 
-VisualAI is an innovative web application designed to help writers, creators, and developers transform written content into visual novel formats. By leveraging modern web technologies and AI assistance, VisualAI streamlines the process of creating interactive narratives from existing text sources.
-
-![VisualAI Logo](./public/images/logo.png)
+VisualAI is a streamlined web application designed to help writers and creators build visual novels directly in the browser. With an intuitive interface focused on scene management, dialogue creation, and visual playback, VisualAI makes it easy to craft interactive storytelling experiences.
 
 ## Features
 
-VisualAI offers a comprehensive set of tools to create and manage visual novel content:
+VisualAI offers a simple yet powerful set of tools organized into three main tabs:
 
-### Integrated Workspace
+### Create Mode
 
-The application provides a unified interface where users can access all tools from a single dashboard. The integrated workspace includes:
+The Create tab is where you build your story:
 
-- **PDF Parser Tool** - Extract dialogue and text from PDF documents
-- **Scene Viewer** - Preview how your visual novel scenes will look and feel
-- **Asset Manager** - Organize audio, video, and image files for your projects
+- **Scene Management** - Create, edit, and organize multiple scenes
+- **Dialogue Editor** - Add dialogue lines with speakers
+- **Character Assignment** - Characters are automatically created when dialogue is added
 
-### PDF Text Extraction
+### Assets Mode
 
-Upload PDF documents to automatically extract and parse dialogue into structured scene formats that can be used in visual novels.
+The Assets tab lets you manage visual elements and characters:
 
-### Scene Editor
+- **Character Manager** - Create and customize characters
+- **Background Images** - Add background images for your scenes
+- **Asset Assignment** - Easily assign characters and backgrounds to scenes
 
-Create, modify, and manage visual novel scenes with an intuitive dialogue editor:
-- Add and edit character dialogue
-- Organize scenes and dialogue sequences
-- Preview scenes in real-time
+### Play Mode
 
-### Asset Management System
+See your visual novel come to life in Play mode:
 
-A powerful asset management system allowing users to:
-- Upload and manage audio files
-- Organize assets by type (audio, video, images)
-- Associate assets with specific scenes or characters
+- **Interactive Playback** - Step through scenes and dialogue
+- **Visual Presentation** - View characters and backgrounds
+- **Scene Navigation** - Move between scenes in your story
 
-### User Authentication
+## Key Features
 
-Secure user authentication system with:
-- User registration and login
-- Profile management
-- Secure session handling
+- **Automated Character Creation** - Characters are automatically added when mentioned in dialogue
+- **Visual Novel Preview** - See how your story will look to readers
+- **Local Storage** - Your projects are saved in your browser
+- **No Server Required** - Works entirely client-side
 
 ## Technology Stack
 
 VisualAI is built with modern web technologies:
 
-- **Next.js** - React framework for server-rendered applications
+- **Next.js** - React framework for web applications
 - **React** - Frontend library for building user interfaces
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
-- **PDF.js** - PDF rendering library
-- **Web Audio API** - For audio processing and playback
-- **PostgreSQL** - Relational database (hosted on AWS RDS)
+- **Zustand** - State management with persistence
 
 ## Getting Started
 
@@ -59,7 +53,6 @@ VisualAI is built with modern web technologies:
 
 - Node.js 18.x or higher
 - npm 9.x or higher
-- PostgreSQL database (local or AWS RDS)
 
 ### Installation
 
@@ -74,76 +67,49 @@ VisualAI is built with modern web technologies:
    npm install
    ```
 
-3. Set up environment variables:
-   - Copy `.env.local.example` to `.env.local`
-   - Update the database connection and other required settings
-
-4. Run the development server:
+3. Run the development server:
    ```
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-### Database Setup
-
-The application requires a PostgreSQL database. You can use a local PostgreSQL instance or AWS RDS:
-
-1. Create a database for the application
-2. Update your `.env.local` file with the connection details
-3. Run the database migrations:
-   ```
-   npx prisma migrate dev
-   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to start using VisualAI.
 
 ## Usage Guide
 
-### PDF Parsing
+### Creating a Project
 
-1. Navigate to the PDF Tool in the dashboard
-2. Upload a PDF document
-3. The system will extract dialogue and text
-4. Review the extracted content in the Scene Viewer
+1. When you first open VisualAI, you'll be prompted to create a new project
+2. Enter a name for your project and click "Create"
+3. A default scene will be automatically created for you
 
-### Scene Editing
+### Adding Dialogue
 
-1. Open the Scene Editor
-2. Add character dialogue with speaker names
-3. Edit or delete dialogue lines as needed
-4. Preview your scene in real-time
+1. Select a scene in the scene selector
+2. Use the dialogue editor to add character lines
+3. Characters are automatically created when you add dialogue with new speakers
 
-### Asset Management
+### Managing Assets
 
-1. Access the Asset Manager
-2. Upload audio files for your visual novel
-3. Organize assets by type (audio, video, images)
-4. Future updates will support video and image assets
+1. Switch to the Assets tab
+2. Add characters and upload images for them
+3. Add background images for your scenes
+4. Assign characters and backgrounds to specific scenes
+
+### Playing Your Story
+
+1. Switch to the Play tab
+2. Use the navigation controls to move through your dialogue
+3. See your characters and backgrounds displayed
+4. Navigate between scenes using the controls
 
 ## Project Structure
 
 - `/src/app` - Next.js app directory with page components
-- `/src/components` - Reusable React components
+- `/src/app/components` - React components for the application
+- `/src/app/components/classes` - Class definitions for Scene, Dialogue, etc.
 - `/src/context` - React context providers
-- `/src/lib` - Utility functions and database operations
+- `/src/lib` - Utility functions and store
+- `/src/styles` - CSS and Tailwind configuration
 - `/src/types` - TypeScript type definitions
-- `/public` - Static assets
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For support or inquiries, please contact support@visualai.example.com
 
 

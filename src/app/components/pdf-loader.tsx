@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { Scene } from './classes/scene';
-import { usePdfJs, extractTextFromPdf } from './pdf-client';
+import { usePdfProcessor, extractTextFromFile } from './pdf-client';
 import { createSceneFromText } from './parser';
+import { useProjectStore } from '@/lib/store';
 
 interface PdfLoaderProps {
   onSceneLoaded?: (scene: Scene) => void;
@@ -17,41 +18,21 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
   const [fileDetails, setFileDetails] = useState<{name: string, type: string} | null>(null);
   const [scene, setScene] = useState<Scene | null>(null);
   
-  const { pdfJs, isLoading: isPdfJsLoading, error: pdfJsError } = usePdfJs();
-
-  const extractTextFromTextFile = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        try {
-          const text = event.target?.result as string;
-          if (text) {
-            resolve(text);
-          } else {
-            reject(new Error('Failed to read text from file'));
-          }
-        } catch (error) {
-          reject(error);
-        }
-      };
-      
-      reader.onerror = () => {
-        reject(new Error('Error reading text file'));
-      };
-      
-      reader.readAsText(file);
-    });
-  };
+  const { createScene } = useProjectStore();
+  const { state: pdfState } = usePdfProcessor();
 
   const processExtractedText = (text: string) => {
+    if (!text || text.trim() === '') {
+      throw new Error('No text content was extracted from the file');
+    }
+    
     try {
-      console.log("================================");
-      console.log("FULL EXTRACTED PDF TEXT:");
-      console.log(text);
-      console.log("================================ from here create the scene and dialogue objects");
-      
+      console.log('Processing extracted text:', text.slice(0, 200) + '...');
       const newScene = createSceneFromText(text);
+      
+      if (!newScene) {
+        throw new Error('Failed to create scene from text');
+      }
       
       setScene(newScene);
       
@@ -59,17 +40,14 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
         onSceneLoaded(newScene);
       }
       
-      console.log("Created scene:", newScene);
-      console.log("Dialogue count:", newScene.dialogue.length);
-      console.log("Speakers:", newScene.speakers);
-      
       setProcessingStatus(`Successfully created scene with ${newScene.dialogue.length} dialogue lines and ${newScene.speakers.length} speakers`);
       setIsLoading(false);
       
       return newScene;
     } catch (error: any) {
-      console.error("Error creating scene:", error);
-      setError(`Error creating scene: ${error.message || 'Unknown error'}`);
+      const errorMsg = `Error creating scene: ${error.message || 'Unknown error'}`;
+      setError(errorMsg);
+      if (onError) onError(errorMsg);
       setIsLoading(false);
       throw error;
     }
@@ -77,7 +55,12 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      const errorMsg = 'No file selected';
+      setError(errorMsg);
+      if (onError) onError(errorMsg);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -87,36 +70,17 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
     
     try {
       if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-        if (pdfJs) {
-          try {
-            setProcessingStatus('Extracting text from PDF...');
-            
-            const extractedText = await extractTextFromPdf(file, pdfJs);
-            
-            processExtractedText(extractedText);
-          } catch (pdfError: any) {
-            console.error('PDF.js extraction error:', pdfError);
-            setError(`PDF extraction failed: ${pdfError.message || 'Unknown error'}`);
-            setIsLoading(false);
-          }
-        } else {
-          setError("PDF processing couldn't be initialized. Please try again later.");
-          setIsLoading(false);
-        }
+        setProcessingStatus('Extracting text from PDF...');
       } else {
-        try {
-          const fileText = await extractTextFromTextFile(file);
-          
-          processExtractedText(fileText);
-        } catch (txtError: any) {
-          console.error('File processing error:', txtError);
-          setError(`File processing failed: ${txtError.message || 'Unknown error'}`);
-          setIsLoading(false);
-        }
+        setProcessingStatus('Reading text file...');
       }
+      
+      const extractedText = await extractTextFromFile(file);
+      processExtractedText(extractedText);
     } catch (error: any) {
-      console.error('General processing error:', error);
-      setError(`File processing error: ${error.message || 'Unknown error'}`);
+      const errorMsg = `File processing failed: ${error.message || 'Unknown error'}`;
+      setError(errorMsg);
+      if (onError) onError(errorMsg);
       setIsLoading(false);
     }
   };
@@ -182,9 +146,9 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
       )}
       
       <div className="alert-info">
-        <h3 className="mb-2 font-medium">Upload PDF for Text Extraction</h3>
+        <h3 className="mb-2 font-medium">Upload PDF or Text File</h3>
         <p className="mb-3 text-sm">
-          Upload a PDF file to extract and analyze its text content.
+          Upload a PDF or text file to extract and analyze its text content.
         </p>
         
         <input 
@@ -192,16 +156,16 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
           accept=".pdf,.txt" 
           onChange={handleFileSelect}
           className="form-file-input"
-          disabled={isLoading || isPdfJsLoading}
+          disabled={isLoading || pdfState.isLoading}
         />
         
-        {isPdfJsLoading && !isLoading && (
+        {pdfState.isLoading && !isLoading && (
           <div className="flex items-center mt-3 text-blue-700">
             <svg className="w-5 h-5 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Loading PDF support...
+            Processing document...
           </div>
         )}
         
@@ -209,7 +173,7 @@ export function PdfLoader({ onSceneLoaded, onError }: PdfLoaderProps) {
           <p className="mb-1 font-medium text-blue-700">Features:</p>
           <ul className="space-y-1 list-disc list-inside">
             <li>Extract text from PDF files</li>
-            <li>Process dialogue automatically</li>
+            <li>Process text files directly</li>
             <li>Create scene data for visualization</li>
           </ul>
         </div>

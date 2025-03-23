@@ -10,15 +10,18 @@
     "test-db": "node src/scripts/test-db-connection.js"
   },
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "next": "15.2.3",
-    "pdfjs-dist": "^3.4.120",
+    "pdf2json": "^3.1.5",
     "pg": "^8.14.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uuid": "^11.1.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

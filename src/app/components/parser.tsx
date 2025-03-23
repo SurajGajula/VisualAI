@@ -49,8 +49,20 @@ export function createSceneFromText(text: string): Scene {
   // Extract unique speakers
   const speakers = extractUniqueSpeakers(dialogues);
   
+  // Create a title based on the first few words of dialogue
+  const title = generateSceneTitle(dialogues);
+  
   // Create and return a Scene
-  return new Scene(dialogues, speakers);
+  return new Scene(dialogues, speakers, { characterSprites: {} }, title);
+}
+
+// Generate a title for the scene based on the first few words of dialogue
+function generateSceneTitle(dialogues: Dialogue[]): string {
+  if (dialogues.length === 0) return "Empty Scene";
+  
+  const firstLine = dialogues[0].line;
+  const words = firstLine.split(' ').slice(0, 3).join(' ');
+  return `${words}${words.length < firstLine.length ? '...' : ''}`;
 }
 
 // Parse dialogue from the extracted text
